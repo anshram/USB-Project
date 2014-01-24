@@ -7,22 +7,32 @@
 #include<linux/device.h>
 #include<linux/errno.h>
 #include<linux/usb.h>
-
-static dev_t devId;
+#include<linux/slab.h>
+#include<linux/uaccess.h>
 static int ret;
-static struct class *USBDevCls;
 static struct device *retDev;
-static struct cdev USBDev;
+typedef struct USBDevice 
+{
+	struct cdev USBCDev;
+	struct usb_device *USBDev;
+	uint8_t buffer[64];
+	struct urb USB_in_urb;
+	struct urb USB_out_urb;
+	dev_t devId;
+	struct class *USBDevCls;
 
+}USBDevice;
 /*******------Driver File Operations-------*******/
 
-int USB_open (struct inode *node , struct file * filp)
+int USB_open (struct inode *indp , struct file * filp)
 {
+	USBDevice *dev = container_of(indp->i_cdev,USBDevice,USBCDev);
+	filp->private_data = dev;
 	printk(KERN_ALERT"In open\n");
 	return 0;
 }
 
-int USB_release (struct inode *node, struct file *filp)
+int USB_release (struct inode *indp, struct file *filp)
 {
 	printk(KERN_ALERT"In release\n");
 	return 0;
@@ -31,7 +41,7 @@ int USB_release (struct inode *node, struct file *filp)
 ssize_t USB_read(struct file *filp, char __user *usrData, size_t len, loff_t *loff)
 {
 	printk(KERN_ALERT"In read\n");
-	return 0;
+	return 	copy_to_user(usrData,"hello&Hi\n",9);
 
 }
 
@@ -62,35 +72,50 @@ static struct usb_device_id USBDev_id[] =
 int USB_probe(struct usb_interface *intf,
 	  const struct usb_device_id *id)
 {
+	USBDevice *dev;
+	struct usb_device *udev;
 	printk(KERN_ALERT"In probe\n");
-	ret = alloc_chrdev_region(&devId,0,1,"USBDev");
+	dev = kzalloc(sizeof(USBDevice),GFP_KERNEL);
+	if(NULL == dev)
+		return -ENOMEM;
+	udev = interface_to_usbdev(intf);
+	dev->USBDev = usb_get_dev(udev);
+	
+	usb_set_intfdata(intf,dev);
+
+	ret = alloc_chrdev_region(&dev->devId,0,1,"USBDev");
 	if(ret < 0)
 	{
+		kfree(dev);
 		return -ret;
 	}
 
-	cdev_init(&USBDev,&USB_ops);
 
-	ret = cdev_add(&USBDev,devId,1);
+	cdev_init(&dev->USBCDev,&USB_ops);
+
+	ret = cdev_add(&dev->USBCDev,dev->devId,1);
 	if(ret < 0)
 	{
-		unregister_chrdev_region(devId,1);
+		kfree(dev);
+		unregister_chrdev_region(dev->devId,1);
 
 	}
 
-	USBDevCls = class_create(THIS_MODULE,"USBDev");
-	if(NULL == USBDevCls)
+	dev->USBDevCls = class_create(THIS_MODULE,"USBDev");
+	if(NULL == dev->USBDevCls)
 	{
-		cdev_del(&USBDev);
-		unregister_chrdev_region(devId,1);
+		cdev_del(&dev->USBCDev);
+		unregister_chrdev_region(dev->devId,1);
+		kfree(dev);
 		return -ENOMEM;
 	}
-	retDev = device_create(USBDevCls,NULL,devId,NULL,"USBDev");
+	retDev = device_create(dev->USBDevCls,NULL,dev->devId,NULL,"USBDev%d",MAJOR(dev->devId));
 	if(NULL == retDev)
 	{
-		cdev_del(&USBDev);
-		unregister_chrdev_region(devId,1);
-		class_destroy(USBDevCls);
+		cdev_del(&dev->USBCDev);
+		unregister_chrdev_region(dev->devId,1);
+		class_destroy(dev->USBDevCls);
+		kfree(dev);
 		return -1;
 	}
 	
@@ -101,11 +126,14 @@ int USB_probe(struct usb_interface *intf,
 
 void USB_disconnect(struct usb_interface *intf)
 {
+	USBDevice *dev;
+	dev = usb_get_intfdata(intf);
 	printk(KERN_ALERT"In disconnect\n");
-	cdev_del(&USBDev);
-	device_destroy(USBDevCls, devId);
-	class_destroy(USBDevCls);
-	unregister_chrdev_region(devId,1);
+	cdev_del(&dev->USBCDev);
+	device_destroy(dev->USBDevCls, dev->devId);
+	class_destroy(dev->USBDevCls);
+	kfree(dev);
+	unregister_chrdev_region(dev->devId,1);
 
 }
 
@@ -116,7 +144,6 @@ static struct usb_driver USBDevDriver =
 	.probe = USB_probe,
 	.disconnect = USB_disconnect
 };
-
 
 /*****----Driver Init And Exit------*******/
 static int __init project_init(void)
@@ -137,3 +164,4 @@ static void __exit  project_exit(void)
 module_init(project_init);
 module_exit(project_exit);
 MODULE_LICENSE("GPL");
+MODULE_DEVICE_TABLE(usb,USBDev_id);

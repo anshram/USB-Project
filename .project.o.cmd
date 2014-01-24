@@ -772,6 +772,20 @@ deps_/home/nishant/dri/project.o := \
   include/linux/selinux.h \
     $(wildcard include/config/security/selinux.h) \
   include/linux/pm_runtime.h \
+  include/linux/slab.h \
+    $(wildcard include/config/slab/debug.h) \
+    $(wildcard include/config/failslab.h) \
+    $(wildcard include/config/slob.h) \
+    $(wildcard include/config/slab.h) \
+    $(wildcard include/config/slub.h) \
+    $(wildcard include/config/debug/slab.h) \
+  include/linux/slub_def.h \
+    $(wildcard include/config/slub/stats.h) \
+    $(wildcard include/config/memcg/kmem.h) \
+    $(wildcard include/config/slub/debug.h) \
+  include/linux/kmemleak.h \
+    $(wildcard include/config/debug/kmemleak.h) \
+  include/linux/uaccess.h \
 
 /home/nishant/dri/project.o: $(deps_/home/nishant/dri/project.o)
 
