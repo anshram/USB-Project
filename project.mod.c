@@ -18,17 +18,17 @@ static const struct modversion_info ____versions[]
 __used
 __attribute__((section("__versions"))) = {
 	{ 0x7dc216d9, __VMLINUX_SYMBOL_STR(module_layout) },
-	{ 0x7565e694, __VMLINUX_SYMBOL_STR(device_destroy) },
 	{ 0x2fbfdab3, __VMLINUX_SYMBOL_STR(usb_deregister) },
-	{ 0x70d0f033, __VMLINUX_SYMBOL_STR(class_destroy) },
-	{ 0xf6c9030a, __VMLINUX_SYMBOL_STR(device_create) },
-	{ 0x7485e15e, __VMLINUX_SYMBOL_STR(unregister_chrdev_region) },
-	{ 0x9dea5d62, __VMLINUX_SYMBOL_STR(cdev_del) },
-	{ 0x1cba218d, __VMLINUX_SYMBOL_STR(__class_create) },
 	{ 0xbb521d73, __VMLINUX_SYMBOL_STR(usb_register_driver) },
+	{ 0xf6c9030a, __VMLINUX_SYMBOL_STR(device_create) },
+	{ 0x1cba218d, __VMLINUX_SYMBOL_STR(__class_create) },
 	{ 0x924236ee, __VMLINUX_SYMBOL_STR(cdev_add) },
 	{ 0xa59dfc19, __VMLINUX_SYMBOL_STR(cdev_init) },
 	{ 0x29537c9e, __VMLINUX_SYMBOL_STR(alloc_chrdev_region) },
+	{ 0x7485e15e, __VMLINUX_SYMBOL_STR(unregister_chrdev_region) },
+	{ 0x70d0f033, __VMLINUX_SYMBOL_STR(class_destroy) },
+	{ 0x7565e694, __VMLINUX_SYMBOL_STR(device_destroy) },
+	{ 0x9dea5d62, __VMLINUX_SYMBOL_STR(cdev_del) },
 	{ 0x27e1a049, __VMLINUX_SYMBOL_STR(printk) },
 	{ 0xbdfb6dbb, __VMLINUX_SYMBOL_STR(__fentry__) },
 };
@@ -39,4 +39,4 @@ __attribute__((section(".modinfo"))) =
 "depends=";
 
 
-MODULE_INFO(srcversion, "9BD4A1C58FA371CB2ACFC12");
+MODULE_INFO(srcversion, "97604D8CB6D3E730BC9172E");
