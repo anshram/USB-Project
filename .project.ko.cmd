@@ -1,0 +1,1 @@
+cmd_/home/nishant/dri/project.ko := ld -r -m elf_x86_64 -T /usr/src/linux-headers-3.11.0-12-generic/scripts/module-common.lds --build-id  -o /home/nishant/dri/project.ko /home/nishant/dri/project.o /home/nishant/dri/project.mod.o

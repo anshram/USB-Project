@@ -1,0 +1,19 @@
+#include<linux/module.h>
+#include<linux/cdev.h>
+static dev_t devId;
+
+static int __init project_init(void)
+{
+	if(alloc_chrdev_region())
+	printk(KERN_ALERT"Hello World\n");
+	return 0;
+}
+
+static void __exit  project_exit(void)
+{
+	printk(KERN_ALERT"Bye World\n");
+}
+
+module_init(project_init);
+module_exit(project_exit);
+MODULE_LICENSE("GPL");
