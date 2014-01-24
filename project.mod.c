@@ -19,11 +19,13 @@ __used
 __attribute__((section("__versions"))) = {
 	{ 0x7dc216d9, __VMLINUX_SYMBOL_STR(module_layout) },
 	{ 0x7565e694, __VMLINUX_SYMBOL_STR(device_destroy) },
+	{ 0x2fbfdab3, __VMLINUX_SYMBOL_STR(usb_deregister) },
 	{ 0x70d0f033, __VMLINUX_SYMBOL_STR(class_destroy) },
 	{ 0xf6c9030a, __VMLINUX_SYMBOL_STR(device_create) },
 	{ 0x7485e15e, __VMLINUX_SYMBOL_STR(unregister_chrdev_region) },
 	{ 0x9dea5d62, __VMLINUX_SYMBOL_STR(cdev_del) },
 	{ 0x1cba218d, __VMLINUX_SYMBOL_STR(__class_create) },
+	{ 0xbb521d73, __VMLINUX_SYMBOL_STR(usb_register_driver) },
 	{ 0x924236ee, __VMLINUX_SYMBOL_STR(cdev_add) },
 	{ 0xa59dfc19, __VMLINUX_SYMBOL_STR(cdev_init) },
 	{ 0x29537c9e, __VMLINUX_SYMBOL_STR(alloc_chrdev_region) },
@@ -37,4 +39,4 @@ __attribute__((section(".modinfo"))) =
 "depends=";
 
 
-MODULE_INFO(srcversion, "BECA618BB9232E1C1DE6FB4");
+MODULE_INFO(srcversion, "9BD4A1C58FA371CB2ACFC12");
