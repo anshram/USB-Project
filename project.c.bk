@@ -37,11 +37,13 @@ int USB_open(struct inode *indp , struct file *filp)
 	struct USBDevice *dev = container_of(indp->i_cdev,
 						struct USBDevice, USBCDev);
 	filp->private_data = dev;
+	printk(KERN_ALERT "In open\n");
 	return 0;
 }
 
 int USB_release(struct inode *indp, struct file *filp)
 {
+	printk(KERN_ALERT"In release\n");
 	return 0;
 }
 
@@ -53,7 +55,9 @@ ssize_t USB_read(struct file *filp, char __user *usrData, size_t len,
 	ret = usb_bulk_msg(dev->USBDev, usb_rcvbulkpipe(dev->USBDev,
 				dev->inAddr),
 			dev->inBuffer, min(dev->inBufSize, len), &count, HZ*10);
+	printk(KERN_ALERT"%s\n", dev->inBuffer);
 	copy_to_user(usrData, dev->inBuffer, min(dev->outBufSize, len));
+	printk(KERN_ALERT"In read\n");
 	return ret;
 }
 
@@ -66,6 +70,7 @@ ssize_t USB_write(struct file *filp, const char __user *usrData, size_t len,
 	ret = usb_bulk_msg(dev->USBDev, usb_sndbulkpipe(dev->USBDev,
 				dev->outAddr), dev->outBuffer,
 			min(dev->outBufSize, len), &count, HZ*10);
+	printk(KERN_ALERT"In write\n");
 	return ret;
 
 }
@@ -93,6 +98,7 @@ int USB_probe(struct usb_interface *intf,
 	struct usb_device *udev;
 	struct usb_host_interface *USBIntf;
 	struct usb_endpoint_descriptor *USBEpDescp;
+	printk(KERN_ALERT"In probe\n");
 	dev = kzalloc(sizeof(struct USBDevice), GFP_KERNEL);
 	if (NULL == dev)
 		return -ENOMEM;
@@ -144,8 +150,10 @@ int USB_probe(struct usb_interface *intf,
 		}
 	}
 
-	if (!(dev->outAddr && dev->inAddr))
+	if (!(dev->outAddr && dev->inAddr)) {
+		printk(KERN_ALERT"Not able to find EndPoint Address");
 		goto err5;
+	}
 	return 0;
 err5:
 	if (dev->outBuffer != NULL)
@@ -168,6 +176,7 @@ void USB_disconnect(struct usb_interface *intf)
 {
 	struct USBDevice *dev;
 	dev = usb_get_intfdata(intf);
+	printk(KERN_ALERT"In disconnect\n");
 	cdev_del(&dev->USBCDev);
 	device_destroy(dev->USBDevCls, dev->devId);
 	class_destroy(dev->USBDevCls);
@@ -187,12 +196,18 @@ static struct usb_driver USBDevDriver = {
 static int __init project_init(void)
 {
 	ret = usb_register(&USBDevDriver);
+
+	printk(KERN_ALERT"Hello World\n");
+
 	return 0;
 }
 
 static void __exit project_exit(void)
 {
 	usb_deregister(&USBDevDriver);
+
+
+	printk(KERN_ALERT"Bye World\n");
 }
 
 module_init(project_init);
