@@ -131,7 +131,7 @@ int USB_probe(struct usb_interface *intf,
 						GFP_KERNEL);
 			if (NULL == dev->inBuffer) {
 				ret = ENOMEM;
-				goto err4;
+				goto err6;
 			}
 
 		}
@@ -144,7 +144,7 @@ int USB_probe(struct usb_interface *intf,
 						GFP_KERNEL);
 			if (NULL == dev->outBuffer) {
 				ret = ENOMEM;
-				goto err5;
+				goto err6;
 			}
 
 		}
@@ -186,9 +186,15 @@ void USB_disconnect(struct usb_interface *intf)
 	struct USBDevice *dev;
 	dev = usb_get_intfdata(intf);
 	if (NULL != dev) {
+	if (dev->inBuffer != NULL)
+		kfree(dev->inBuffer);
+	if (dev->outBuffer != NULL)
+		kfree(dev->outBuffer);
 	cdev_del(&dev->USBCDev);
+	if (NULL != dev->USBDevCls) {
 	device_destroy(dev->USBDevCls, dev->devId);
 	class_destroy(dev->USBDevCls);
+	}
 	usb_put_dev(dev->USBDev);
 	unregister_chrdev_region(dev->devId, 1);
 	kfree(dev);
