@@ -54,9 +54,8 @@ ssize_t USB_read(struct file *filp, char __user *usrData, size_t len,
 	int count;
 	USBDevice *dev = (USBDevice *) filp->private_data;
 	printk(KERN_ALERT"%d",dev->inAddr);
-	ret = usb_bulk_msg(dev->USBDev,usb_rcvbulkpipe(dev->USBDev,0x81)
+	ret = usb_bulk_msg(dev->USBDev,usb_rcvbulkpipe(dev->USBDev,dev->inAddr)
 			,dev->inBuffer,min(dev->inBufSize,len),&count,HZ*10);
-	printk(KERN_ALERT"%s\n",dev->inBuffer);
 	copy_to_user(usrData,dev->inBuffer,min(dev->outBufSize,len));
 	printk(KERN_ALERT"In read\n");
 	return ret;
@@ -129,10 +128,10 @@ int USB_probe(struct usb_interface *intf,
 		goto err4;
 	USBIntf = intf->cur_altsetting;
 	
+
 	for(i=0;i < USBIntf->desc.bNumEndpoints;++i)
 	{
 		USBEpDescp = &USBIntf->endpoint[i].desc;
-		printk(KERN_ALERT"1%d\n",i);	
 		
 		if((USBEpDescp->bEndpointAddress & USB_DIR_IN) && 
 		((USBEpDescp->bmAttributes & USB_ENDPOINT_XFERTYPE_MASK) 
@@ -147,13 +146,10 @@ int USB_probe(struct usb_interface *intf,
 
 		}
 		
-		printk(KERN_ALERT"2%o\n",USBEpDescp->bEndpointAddress);	
-		
-		if(!(USBEpDescp->bEndpointAddress & USB_DIR_IN) && 
+		if((USBEpDescp->bEndpointAddress & USB_DIR_OUT) && 
 		((USBEpDescp->bmAttributes & USB_ENDPOINT_XFERTYPE_MASK) 
 		 == USB_ENDPOINT_XFER_BULK ))
 		{
-		printk(KERN_ALERT"3%d\n",i);	
 			dev->outAddr = USBEpDescp->bEndpointAddress;
 			dev->outBufSize = USBEpDescp->wMaxPacketSize;
 			dev->outBuffer = kzalloc(USBEpDescp->wMaxPacketSize,
@@ -166,8 +162,7 @@ int USB_probe(struct usb_interface *intf,
 		
 	}
 
-		printk(KERN_ALERT"%d,%d\n",dev->outAddr,dev->inAddr);	
-	if(!(dev->outAddr && dev->inAddr))
+	if(dev->outAddr && dev->inAddr)
 	{
 		printk(KERN_ALERT"Not able to find EndPoint Address");
 		goto err5;
