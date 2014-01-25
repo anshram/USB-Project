@@ -96,6 +96,8 @@ int USB_probe(struct usb_interface *intf,
 	dev = kzalloc(sizeof(struct USBDevice), GFP_KERNEL);
 	if (NULL == dev)
 		return -ENOMEM;
+	dev->inBuffer = NULL;
+	dev->outBuffer = NULL;
 	udev = interface_to_usbdev(intf);
 	dev->USBDev = usb_get_dev(udev);
 	dev->USBIntf = intf;
@@ -127,8 +129,10 @@ int USB_probe(struct usb_interface *intf,
 			dev->inBufSize = USBEpDescp->wMaxPacketSize;
 			dev->inBuffer = kzalloc(USBEpDescp->wMaxPacketSize,
 						GFP_KERNEL);
-			if (NULL == dev->inBuffer)
-				goto err5;
+			if (NULL == dev->inBuffer) {
+				ret = ENOMEM;
+				goto err4;
+			}
 
 		}
 		if (!(USBEpDescp->bEndpointAddress & USB_DIR_IN) &&
@@ -138,29 +142,42 @@ int USB_probe(struct usb_interface *intf,
 			dev->outBufSize = USBEpDescp->wMaxPacketSize;
 			dev->outBuffer = kzalloc(USBEpDescp->wMaxPacketSize,
 						GFP_KERNEL);
-			if (NULL == dev->outBuffer)
+			if (NULL == dev->outBuffer) {
+				ret = ENOMEM;
 				goto err5;
+			}
 
 		}
 	}
 
 	if (!(dev->outAddr && dev->inAddr))
-		goto err5;
+		goto err6;
+	printk(KERN_ALERT"1\n");
 	return 0;
-err5:
-	if (dev->outBuffer != NULL)
-		kfree(dev->outBuffer);
+err6:
+	printk(KERN_ALERT"2\n");
 	if (dev->inBuffer != NULL)
 		kfree(dev->inBuffer);
+	if (dev->outBuffer != NULL)
+		kfree(dev->outBuffer);
+err5:
+	device_destroy(dev->USBDevCls, dev->devId);
 err4:
+	printk(KERN_ALERT"3\n");
 	class_destroy(dev->USBDevCls);
 err3:
+	printk(KERN_ALERT"4\n");
 	cdev_del(&dev->USBCDev);
 err2:
+	printk(KERN_ALERT"5\n");
 	unregister_chrdev_region(dev->devId, 1);
 err1:
+	printk(KERN_ALERT"6\n");
+	usb_put_dev(dev->USBDev);
 	kfree(dev);
-	return -1;
+	usb_set_intfdata(intf, NULL);
+	printk(KERN_ALERT"7\n");
+	return -ret;
 
 }
 
@@ -168,12 +185,14 @@ void USB_disconnect(struct usb_interface *intf)
 {
 	struct USBDevice *dev;
 	dev = usb_get_intfdata(intf);
+	if (NULL != dev) {
 	cdev_del(&dev->USBCDev);
 	device_destroy(dev->USBDevCls, dev->devId);
 	class_destroy(dev->USBDevCls);
-	kfree(dev);
+	usb_put_dev(dev->USBDev);
 	unregister_chrdev_region(dev->devId, 1);
-
+	kfree(dev);
+	}
 }
 
 static struct usb_driver USBDevDriver = {
