@@ -31,16 +31,16 @@ __attribute__((section("__versions"))) = {
 	{ 0x2a83b971, __VMLINUX_SYMBOL_STR(usb_get_dev) },
 	{ 0xa6327d27, __VMLINUX_SYMBOL_STR(kmem_cache_alloc_trace) },
 	{ 0xdf08d9a5, __VMLINUX_SYMBOL_STR(kmalloc_caches) },
-	{ 0x37a0cba, __VMLINUX_SYMBOL_STR(kfree) },
 	{ 0x7485e15e, __VMLINUX_SYMBOL_STR(unregister_chrdev_region) },
 	{ 0x2221a11b, __VMLINUX_SYMBOL_STR(usb_put_dev) },
 	{ 0x70d0f033, __VMLINUX_SYMBOL_STR(class_destroy) },
 	{ 0x7565e694, __VMLINUX_SYMBOL_STR(device_destroy) },
 	{ 0x9dea5d62, __VMLINUX_SYMBOL_STR(cdev_del) },
+	{ 0x37a0cba, __VMLINUX_SYMBOL_STR(kfree) },
 	{ 0x44d787a, __VMLINUX_SYMBOL_STR(dev_get_drvdata) },
 	{ 0x4f6b400b, __VMLINUX_SYMBOL_STR(_copy_from_user) },
 	{ 0x4f8b5ddb, __VMLINUX_SYMBOL_STR(_copy_to_user) },
-	{ 0x9fb27a36, __VMLINUX_SYMBOL_STR(usb_bulk_msg) },
+	{ 0x65d4ac63, __VMLINUX_SYMBOL_STR(usb_interrupt_msg) },
 	{ 0xbdfb6dbb, __VMLINUX_SYMBOL_STR(__fentry__) },
 };
 
@@ -51,4 +51,4 @@ __attribute__((section(".modinfo"))) =
 
 MODULE_ALIAS("usb:v1CBEp0003d*dc*dsc*dp*ic*isc*ip*in*");
 
-MODULE_INFO(srcversion, "2BC26B26BB2966B13F4FF33");
+MODULE_INFO(srcversion, "9CD5B4D6B5D9EC52C8C8106");

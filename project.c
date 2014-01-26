@@ -50,7 +50,7 @@ ssize_t USB_read(struct file *filp, char __user *usrData, size_t len,
 {
 	int count;
 	struct USBDevice *dev = (struct USBDevice *) filp->private_data;
-	ret = usb_bulk_msg(dev->USBDev, usb_rcvbulkpipe(dev->USBDev,
+	ret = usb_interrupt_msg(dev->USBDev, usb_rcvbulkpipe(dev->USBDev,
 				dev->inAddr),
 			dev->inBuffer, min(dev->inBufSize, len), &count, HZ*10);
 	copy_to_user(usrData, dev->inBuffer, min(dev->outBufSize, len));
@@ -63,7 +63,7 @@ ssize_t USB_write(struct file *filp, const char __user *usrData, size_t len,
 	int count;
 	struct USBDevice *dev = (struct USBDevice *) filp->private_data;
 	copy_from_user(dev->outBuffer, usrData, min(dev->outBufSize, len));
-	ret = usb_bulk_msg(dev->USBDev, usb_sndbulkpipe(dev->USBDev,
+	ret = usb_interrupt_msg(dev->USBDev, usb_sndbulkpipe(dev->USBDev,
 				dev->outAddr), dev->outBuffer,
 			min(dev->outBufSize, len), &count, HZ*10);
 	return ret;
@@ -124,43 +124,43 @@ int USB_probe(struct usb_interface *intf,
 		USBEpDescp = &USBIntf->endpoint[i].desc;
 		if ((USBEpDescp->bEndpointAddress & USB_DIR_IN) &&
 		((USBEpDescp->bmAttributes & USB_ENDPOINT_XFERTYPE_MASK)
-		 == USB_ENDPOINT_XFER_BULK)) {
+		 == USB_ENDPOINT_XFER_INT)) {
 			dev->inAddr = USBEpDescp->bEndpointAddress;
 			dev->inBufSize = USBEpDescp->wMaxPacketSize;
 			dev->inBuffer = kzalloc(USBEpDescp->wMaxPacketSize,
 						GFP_KERNEL);
 			if (NULL == dev->inBuffer) {
 				ret = ENOMEM;
-				goto err6;
+				goto err5;
 			}
 
 		}
 		if (!(USBEpDescp->bEndpointAddress & USB_DIR_IN) &&
 		((USBEpDescp->bmAttributes & USB_ENDPOINT_XFERTYPE_MASK)
-		 == USB_ENDPOINT_XFER_BULK)) {
+		 == USB_ENDPOINT_XFER_INT)) {
 			dev->outAddr = USBEpDescp->bEndpointAddress;
 			dev->outBufSize = USBEpDescp->wMaxPacketSize;
 			dev->outBuffer = kzalloc(USBEpDescp->wMaxPacketSize,
 						GFP_KERNEL);
 			if (NULL == dev->outBuffer) {
 				ret = ENOMEM;
-				goto err6;
+				goto err5;
 			}
 
 		}
 	}
 
 	if (!(dev->outAddr && dev->inAddr))
-		goto err6;
+		goto err5;
 	printk(KERN_ALERT"1\n");
 	return 0;
-err6:
+err5:
 	printk(KERN_ALERT"2\n");
 	if (dev->inBuffer != NULL)
 		kfree(dev->inBuffer);
 	if (dev->outBuffer != NULL)
 		kfree(dev->outBuffer);
-err5:
+
 	device_destroy(dev->USBDevCls, dev->devId);
 err4:
 	printk(KERN_ALERT"3\n");
