@@ -82,6 +82,7 @@ static const struct file_operations USB_ops = {
 
 static struct usb_device_id USBDev_id[] = {
 	{ USB_DEVICE(0x1cbe, 0x0003) },
+	{ USB_DEVICE(0x1cbe, 0x00fd) },
 	{}
 };
 
@@ -89,6 +90,7 @@ int USB_probe(struct usb_interface *intf,
 	  const struct usb_device_id *id)
 {
 	uint8_t i = 0;
+	uint8_t name[10];
 	struct USBDevice *dev;
 	struct usb_device *udev;
 	struct usb_host_interface *USBIntf;
@@ -111,12 +113,12 @@ int USB_probe(struct usb_interface *intf,
 	ret = cdev_add(&dev->USBCDev, dev->devId, 1);
 	if (ret < 0)
 		goto err2;
-
-	dev->USBDevCls = class_create(THIS_MODULE, "USBDev");
+	sprintf(name, "USBDev %d", MINOR(dev->devId));
+	dev->USBDevCls = class_create(THIS_MODULE, name);
 	if (NULL == dev->USBDevCls)
 		goto err3;
 	retDev = device_create(dev->USBDevCls, NULL, dev->devId, NULL,
-				"USBDev%d", MAJOR(dev->devId));
+				"USBDev%d", MINOR(dev->devId));
 	if (NULL == retDev)
 		goto err4;
 	USBIntf = intf->cur_altsetting;

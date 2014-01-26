@@ -20,10 +20,12 @@ __attribute__((section("__versions"))) = {
 	{ 0x7dc216d9, __VMLINUX_SYMBOL_STR(module_layout) },
 	{ 0x2fbfdab3, __VMLINUX_SYMBOL_STR(usb_deregister) },
 	{ 0xbb521d73, __VMLINUX_SYMBOL_STR(usb_register_driver) },
+	{ 0xf0fdf6cb, __VMLINUX_SYMBOL_STR(__stack_chk_fail) },
 	{ 0x27e1a049, __VMLINUX_SYMBOL_STR(printk) },
 	{ 0xd2b09ce5, __VMLINUX_SYMBOL_STR(__kmalloc) },
 	{ 0xf6c9030a, __VMLINUX_SYMBOL_STR(device_create) },
 	{ 0x1cba218d, __VMLINUX_SYMBOL_STR(__class_create) },
+	{ 0x91715312, __VMLINUX_SYMBOL_STR(sprintf) },
 	{ 0x924236ee, __VMLINUX_SYMBOL_STR(cdev_add) },
 	{ 0xa59dfc19, __VMLINUX_SYMBOL_STR(cdev_init) },
 	{ 0x29537c9e, __VMLINUX_SYMBOL_STR(alloc_chrdev_region) },
@@ -50,5 +52,6 @@ __attribute__((section(".modinfo"))) =
 "depends=";
 
 MODULE_ALIAS("usb:v1CBEp0003d*dc*dsc*dp*ic*isc*ip*in*");
+MODULE_ALIAS("usb:v1CBEp00FDd*dc*dsc*dp*ic*isc*ip*in*");
 
-MODULE_INFO(srcversion, "9CD5B4D6B5D9EC52C8C8106");
+MODULE_INFO(srcversion, "9319026AD96018F0A6BA606");

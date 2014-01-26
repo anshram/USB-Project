@@ -24,9 +24,9 @@ int main(int argv, char *argc[])
 //	write(d,"x",1);
 //while(	!read(d,a,20));
 //	printf("%s",a);i
-	read(d,hel , 16);
+	read(d,hel , 1);
 	dev = (devData *)hel;
-	printf("%d , %d",dev->a,dev->b);
-//printf("%s",hel);
+//	printf("%d , %d",dev->a,dev->b);
+	printf("%d\n",hel[0]);
 	return 0;
 }
