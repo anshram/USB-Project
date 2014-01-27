@@ -52,6 +52,5 @@ __attribute__((section(".modinfo"))) =
 "depends=";
 
 MODULE_ALIAS("usb:v1CBEp0003d*dc*dsc*dp*ic*isc*ip*in*");
-MODULE_ALIAS("usb:v1CBEp00FDd*dc*dsc*dp*ic*isc*ip*in*");
 
-MODULE_INFO(srcversion, "9319026AD96018F0A6BA606");
+MODULE_INFO(srcversion, "A16A598FDAC2DF6F5E1E39F");

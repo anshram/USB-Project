@@ -66,7 +66,7 @@ ssize_t USB_write(struct file *filp, const char __user *usrData, size_t len,
 	ret = usb_interrupt_msg(dev->USBDev, usb_sndbulkpipe(dev->USBDev,
 				dev->outAddr), dev->outBuffer,
 			min(dev->outBufSize, len), &count, HZ*10);
-	return ret;
+	return min(len, dev->outBufSize);
 
 }
 
@@ -82,7 +82,6 @@ static const struct file_operations USB_ops = {
 
 static struct usb_device_id USBDev_id[] = {
 	{ USB_DEVICE(0x1cbe, 0x0003) },
-	{ USB_DEVICE(0x1cbe, 0x00fd) },
 	{}
 };
 
@@ -118,7 +117,7 @@ int USB_probe(struct usb_interface *intf,
 	if (NULL == dev->USBDevCls)
 		goto err3;
 	retDev = device_create(dev->USBDevCls, NULL, dev->devId, NULL,
-				"USBDev%d", MINOR(dev->devId));
+				"USBDev%d", MAJOR(dev->devId));
 	if (NULL == retDev)
 		goto err4;
 	USBIntf = intf->cur_altsetting;
